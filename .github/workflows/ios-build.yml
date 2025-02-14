@@ -1,4 +1,4 @@
-name: iOS Build (Unsign)
+name: iOS Build (No Signing, No Export)
 
 on:
   push:
@@ -18,8 +18,7 @@ jobs:
           node-version: 20
 
       - name: Install JS dependencies
-        run: |
-          npm install
+        run: npm install
 
       - name: Install pods
         run: |
@@ -27,7 +26,7 @@ jobs:
           pod install
           cd ..
 
-      - name: Build .ipa (no signing)
+      - name: Build iOS Archive (no signing)
         run: |
           set -e
           xcodebuild \
@@ -41,17 +40,10 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             clean archive
 
-          xcodebuild \
-            -exportArchive \
-            -archivePath build/DeployTest.xcarchive \
-            -exportPath build \
-            -exportOptionsPlist ios/ExportOptions.plist \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
-
-      - name: Upload artifact
+      # (Opcional) Publicar o .xcarchive como artefato
+      # para análise offline do build ou para debugging
+      - name: Upload Archive Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DeployTest-ipa
-          path: build/DeployTest.ipa
+          name: DeployTest-archive
+          path: build/DeployTest.xcarchive
