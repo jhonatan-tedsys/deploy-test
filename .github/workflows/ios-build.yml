@@ -1,0 +1,58 @@
+name: iOS Build (Unsign)
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install JS dependencies
+        run: |
+          yarn install
+
+      - name: Install pods
+        run: |
+          cd ios
+          pod install
+          cd ..
+
+      - name: Build .ipa (no signing)
+        run: |
+          set -e
+          xcodebuild \
+            -workspace ios/MeuApp.xcworkspace \
+            -scheme MeuApp \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath build/MeuApp.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            clean archive
+          
+          # Export sem assinar (pode falhar em algumas versões do xcodebuild).
+          xcodebuild \
+            -exportArchive \
+            -archivePath build/MeuApp.xcarchive \
+            -exportPath build \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: MeuApp-ipa
+          path: build/MeuApp.ipa
