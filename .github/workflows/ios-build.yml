@@ -31,20 +31,19 @@ jobs:
         run: |
           set -e
           xcodebuild \
-            -workspace ios/MeuApp.xcworkspace \
-            -scheme MeuApp \
+            -workspace ios/DeployTest.xcworkspace \
+            -scheme DeployTest \
             -configuration Release \
             -sdk iphoneos \
-            -archivePath build/MeuApp.xcarchive \
+            -archivePath build/DeployTest.xcarchive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             clean archive
-          
-          # Export sem assinar (pode falhar em algumas versões do xcodebuild).
+
           xcodebuild \
             -exportArchive \
-            -archivePath build/MeuApp.xcarchive \
+            -archivePath build/DeployTest.xcarchive \
             -exportPath build \
             -exportOptionsPlist ios/ExportOptions.plist \
             CODE_SIGN_IDENTITY="" \
@@ -54,5 +53,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MeuApp-ipa
-          path: build/MeuApp.ipa
+          name: DeployTest-ipa
+          path: build/DeployTest.ipa
