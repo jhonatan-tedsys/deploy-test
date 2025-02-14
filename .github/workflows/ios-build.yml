@@ -19,7 +19,7 @@ jobs:
 
       - name: Install JS dependencies
         run: |
-          yarn install
+          npm install
 
       - name: Install pods
         run: |
